@@ -20,7 +20,6 @@
       --text-main: #ffffff;
       --text-sub: #aab1c5;
       --text-mute: #737b91;
-      --danger: #ff4b6a;
     }
 
     * {
@@ -47,22 +46,45 @@
     }
 
     header {
-      text-align: center;
       margin-bottom: 18px;
     }
 
-    header h1 {
+    .header-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .header-text {
+      flex: 1;
+      text-align: center;
+    }
+
+    .header-text h1 {
       font-size: 24px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       margin: 0 0 4px;
     }
 
-    header p {
+    .header-text p {
       margin: 0;
       font-size: 13px;
       color: var(--text-sub);
       line-height: 1.4;
+    }
+
+    .lang-toggle {
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 11px;
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text-sub);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .lang-toggle:active {
+      transform: scale(0.97);
+      opacity: 0.9;
     }
 
     .card {
@@ -192,6 +214,12 @@
       border-radius: 999px;
     }
 
+    .bpm-suggest {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--text-mute);
+    }
+
     .status-text {
       margin-top: 6px;
       font-size: 12px;
@@ -224,6 +252,27 @@
       opacity: 0.95;
     }
 
+    .copy-row {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .mini-btn {
+      flex: 0 0 auto;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-sub);
+      font-size: 11px;
+    }
+
+    .mini-btn:active {
+      transform: scale(0.98);
+    }
+
     /* Tap BPM */
 
     .tap-wrapper {
@@ -247,6 +296,8 @@
       background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%),
                   radial-gradient(circle at 70% 80%, rgba(29, 185, 84, 0.25), transparent 65%);
       color: var(--text-main);
+      text-align: center;
+      padding: 0 12px;
     }
 
     .tap-circle.tap-active {
@@ -282,11 +333,59 @@
       text-decoration: underline;
     }
 
+    /* 历史记录 */
+
+    .history-list {
+      margin-top: 6px;
+      max-height: 190px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .history-item {
+      padding: 6px 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: rgba(0, 0, 0, 0.1);
+      margin-bottom: 4px;
+    }
+
+    .history-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-name {
+      font-size: 13px;
+      color: var(--text-sub);
+      flex: 1;
+      text-align: left;
+    }
+
+    .history-bpm {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .history-sub {
+      font-size: 11px;
+      color: var(--text-mute);
+      margin-top: 2px;
+      text-align: left;
+    }
+
+    .history-empty {
+      font-size: 12px;
+      color: var(--text-mute);
+    }
+
     @media (min-width: 700px) {
       .app-shell {
         padding-top: 32px;
       }
-      header h1 {
+      .header-text h1 {
         font-size: 26px;
       }
     }
@@ -295,19 +394,26 @@
 <body>
   <div class="app-shell">
     <header>
-      <h1>本地音乐 BPM 检测</h1>
-      <p>选择本地音频文件，一键分析节奏，也可以用手动 Tap 算 BPM。</p>
+      <div class="header-row">
+        <div class="header-text">
+          <h1 id="titleApp">本地音乐 BPM 检测</h1>
+          <p id="subtitleApp">选择本地音频文件，一键分析节奏，也可以用手动 Tap 算 BPM。</p>
+        </div>
+        <button id="langToggle" class="lang-toggle" type="button">中 / EN</button>
+      </div>
     </header>
 
     <main class="card">
       <!-- 文件 & 播放 -->
       <section class="card-section">
         <div class="section-title">
-          <span>音频文件</span>
-          <span class="pill">本地处理 · 无上传</span>
+          <span id="fileSectionTitle">音频文件</span>
+          <span class="pill" id="filePill">本地处理 · 无上传</span>
         </div>
 
-        <label class="file-label" for="fileInput">选择音频文件</label>
+        <label class="file-label" for="fileInput">
+          <span id="btnChooseFileLabel">选择音频文件</span>
+        </label>
         <input id="fileInput" type="file" />
 
         <p id="fileName" class="file-name">当前未选择文件</p>
@@ -318,13 +424,19 @@
 
         <div class="bpm-display">
           <div class="bpm-left">
-            <span class="bpm-label">自动检测</span>
+            <span class="bpm-label" id="autoLabel">自动检测</span>
             <div>
               <span id="autoBpmValue" class="bpm-value">--</span>
               <span class="bpm-unit">BPM</span>
             </div>
+            <div id="autoSuggest" class="bpm-suggest"></div>
           </div>
           <span id="autoBadge" class="badge">等待分析</span>
+        </div>
+
+        <div class="copy-row">
+          <button id="copyAutoBpm" type="button" class="mini-btn">复制自动 BPM</button>
+          <button id="copyTapBpm" type="button" class="mini-btn">复制 Tap BPM</button>
         </div>
 
         <p id="status" class="status-text"></p>
@@ -333,121 +445,284 @@
       <!-- Tap BPM -->
       <section class="card-section">
         <div class="section-title">
-          <span>手动 Tap 节奏</span>
-          <span class="pill">适合现场 / 外放音乐</span>
+          <span id="tapSectionTitle">手动 Tap 节奏</span>
+          <span class="pill" id="tapPill">适合现场 / 外放音乐</span>
         </div>
 
         <div class="tap-wrapper">
           <button id="tapButton" type="button" class="tap-circle">
-            跟着节奏点我
+            <span id="tapCircleLabel">跟着节奏点我</span>
           </button>
 
           <div class="tap-info">
-            最近节奏估计：
+            <span id="tapInfoHeader">最近节奏估计：</span>
             <div id="tapBpmValue" class="tap-bpm">-- BPM</div>
             <div class="tap-actions">
-              <button id="tapReset" type="button" class="tap-reset">清空节奏</button>
+              <button id="tapReset" type="button" class="tap-reset">
+                <span id="tapResetText">清空节奏</span>
+              </button>
             </div>
-            <div style="margin-top: 4px;">
+            <div id="tapHint" style="margin-top: 4px;">
               可以让手机听音箱、现场音乐，用手跟着节奏连续点击。
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- 历史记录 -->
+      <section class="card-section">
+        <div class="section-title">
+          <span id="historyTitle">历史记录</span>
+          <span class="pill" id="historyHint">本次打开期间</span>
+        </div>
+        <div id="historyList" class="history-list">
+          <span class="history-empty" id="historyEmptyText">暂无记录</span>
         </div>
       </section>
     </main>
   </div>
 
   <script>
+    // DOM 元素
     const fileInput = document.getElementById("fileInput");
     const analyzeButton = document.getElementById("analyzeButton");
     const fileNameEl = document.getElementById("fileName");
     const statusEl = document.getElementById("status");
     const autoBpmValueEl = document.getElementById("autoBpmValue");
     const autoBadgeEl = document.getElementById("autoBadge");
+    const autoSuggestEl = document.getElementById("autoSuggest");
     const audioPlayer = document.getElementById("audioPlayer");
 
     const tapButton = document.getElementById("tapButton");
     const tapBpmValueEl = document.getElementById("tapBpmValue");
     const tapResetButton = document.getElementById("tapReset");
 
+    const copyAutoBtn = document.getElementById("copyAutoBpm");
+    const copyTapBtn = document.getElementById("copyTapBpm");
+
+    const historyListEl = document.getElementById("historyList");
+    const langToggle = document.getElementById("langToggle");
+
+    // 状态
     let currentFile = null;
     let audioContext = null;
+    let tapTimes = [];
+    let historyItems = [];
+    let currentLang = "zh";
+    let autoState = "idle";
+    let autoBpmLast = null;
+
+    // 文案
+    const I18N = {
+      zh: {
+        title: "本地音乐 BPM 检测",
+        subtitle: "选择本地音频文件，一键分析节奏，也可以用手动 Tap 算 BPM。",
+        fileSectionTitle: "音频文件",
+        filePill: "本地处理 · 无上传",
+        chooseFile: "选择音频文件",
+        analyzeBtn: "分析 BPM（自动检测）",
+        autoLabel: "自动检测",
+        tapSectionTitle: "手动 Tap 节奏",
+        tapPill: "适合现场 / 外放音乐",
+        tapCircle: "跟着节奏点我",
+        tapInfoHeader: "最近节奏估计：",
+        tapHint: "可以让手机听音箱、现场音乐，用手跟着节奏连续点击。",
+        tapReset: "清空节奏",
+        historyTitle: "历史记录",
+        historyHint: "本次打开期间",
+        historyEmpty: "暂无记录",
+        copyAuto: "复制自动 BPM",
+        copyTap: "复制 Tap BPM"
+      },
+      en: {
+        title: "Local Audio BPM",
+        subtitle: "Pick a local audio file, auto-detect its tempo, or tap along by hand.",
+        fileSectionTitle: "Audio file",
+        filePill: "On-device · No upload",
+        chooseFile: "Choose audio file",
+        analyzeBtn: "Analyze BPM (auto)",
+        autoLabel: "Auto detect",
+        tapSectionTitle: "Tap tempo",
+        tapPill: "Great for live / speakers",
+        tapCircle: "Tap with the beat",
+        tapInfoHeader: "Recent tempo estimate:",
+        tapHint: "Let your phone hear the music and tap along to get BPM.",
+        tapReset: "Clear taps",
+        historyTitle: "History",
+        historyHint: "This session only",
+        historyEmpty: "No records yet",
+        copyAuto: "Copy auto BPM",
+        copyTap: "Copy tap BPM"
+      }
+    };
+
+    function applyLang(lang) {
+      currentLang = lang;
+      const t = I18N[lang];
+
+      document.getElementById("titleApp").textContent = t.title;
+      document.getElementById("subtitleApp").textContent = t.subtitle;
+      document.getElementById("fileSectionTitle").textContent = t.fileSectionTitle;
+      document.getElementById("filePill").textContent = t.filePill;
+      document.getElementById("btnChooseFileLabel").textContent = t.chooseFile;
+      document.getElementById("analyzeButton").textContent = t.analyzeBtn;
+      document.getElementById("autoLabel").textContent = t.autoLabel;
+      document.getElementById("tapSectionTitle").textContent = t.tapSectionTitle;
+      document.getElementById("tapPill").textContent = t.tapPill;
+      document.getElementById("tapCircleLabel").textContent = t.tapCircle;
+      document.getElementById("tapInfoHeader").textContent = t.tapInfoHeader;
+      document.getElementById("tapHint").textContent = t.tapHint;
+      document.getElementById("tapResetText").textContent = t.tapReset;
+      document.getElementById("historyTitle").textContent = t.historyTitle;
+      document.getElementById("historyHint").textContent = t.historyHint;
+      const emptyEl = document.getElementById("historyEmptyText");
+      if (emptyEl) {
+        emptyEl.textContent = t.historyEmpty;
+      }
+      document.getElementById("copyAutoBpm").textContent = t.copyAuto;
+      document.getElementById("copyTapBpm").textContent = t.copyTap;
+
+      langToggle.textContent = lang === "zh" ? "中 / EN" : "EN / 中";
+
+      // 重画自动 BPM 状态和历史文案
+      setAutoBPM(autoBpmLast, autoState);
+      renderHistory();
+    }
 
     function setStatus(text) {
       statusEl.textContent = text || "";
     }
 
-    function setAutoBPM(bpmText, state) {
-      autoBpmValueEl.textContent = bpmText || "--";
+    function updateAutoSuggestions(bpm) {
+      if (!autoSuggestEl) return;
+      if (typeof bpm !== "number" || !isFinite(bpm)) {
+        autoSuggestEl.textContent = "";
+        return;
+      }
+      const rounded = Math.round(bpm);
+      const half = Math.round(rounded / 2);
+      const dbl = rounded * 2;
+      const parts = [];
+      if (half >= 50) {
+        parts.push("半速约 " + half + " BPM");
+      }
+      if (dbl <= 240) {
+        parts.push("双倍约 " + dbl + " BPM");
+      }
+      autoSuggestEl.textContent = parts.join(" · ");
+    }
+
+    function setAutoBPM(bpm, state) {
+      autoState = state;
+      if (typeof bpm === "number" && isFinite(bpm)) {
+        autoBpmLast = bpm;
+        const rounded = Math.round(bpm);
+        autoBpmValueEl.textContent = String(rounded);
+        updateAutoSuggestions(rounded);
+      } else {
+        autoBpmLast = null;
+        autoBpmValueEl.textContent = "--";
+        updateAutoSuggestions(null);
+      }
+
       if (state === "idle") {
-        autoBadgeEl.textContent = "等待分析";
+        autoBadgeEl.textContent = currentLang === "zh" ? "等待分析" : "Idle";
         autoBadgeEl.style.color = "#aab1c5";
         autoBadgeEl.style.background = "rgba(255,255,255,0.04)";
       } else if (state === "ok") {
-        autoBadgeEl.textContent = "分析完成";
+        autoBadgeEl.textContent = currentLang === "zh" ? "分析完成" : "Done";
         autoBadgeEl.style.color = "#1db954";
         autoBadgeEl.style.background = "rgba(29,185,84,0.16)";
       } else if (state === "error") {
-        autoBadgeEl.textContent = "分析失败";
+        autoBadgeEl.textContent = currentLang === "zh" ? "分析失败" : "Error";
         autoBadgeEl.style.color = "#ff8fa1";
         autoBadgeEl.style.background = "rgba(255,75,106,0.16)";
       } else if (state === "working") {
-        autoBadgeEl.textContent = "分析中...";
+        autoBadgeEl.textContent = currentLang === "zh" ? "分析中..." : "Analyzing...";
         autoBadgeEl.style.color = "#ffd27f";
         autoBadgeEl.style.background = "rgba(255,210,127,0.16)";
       }
     }
 
-    fileInput.addEventListener("change", () => {
-      const file = fileInput.files && fileInput.files[0];
-      if (!file) return;
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function (c) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[c];
+      });
+    }
 
-      currentFile = file;
-      fileNameEl.textContent = file.name;
-      setStatus("");
-      setAutoBPM("--", "idle");
+    function formatTime(date) {
+      const h = String(date.getHours()).padStart(2, "0");
+      const m = String(date.getMinutes()).padStart(2, "0");
+      return h + ":" + m;
+    }
 
-      const url = URL.createObjectURL(file);
-      audioPlayer.src = url;
-
-      analyzeButton.disabled = false;
-    });
-
-    analyzeButton.addEventListener("click", async () => {
-      if (!currentFile) return;
-
-      analyzeButton.disabled = true;
-      setStatus("正在分析音频，大约需要几秒钟...");
-      setAutoBPM("--", "working");
-
-      try {
-        if (!audioContext) {
-          const AC = window.AudioContext || window.webkitAudioContext;
-          audioContext = new AC();
-        }
-
-        const arrayBuffer = await currentFile.arrayBuffer();
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-        const bpm = estimateBPMFromBuffer(audioBuffer);
-        if (bpm) {
-          const rounded = Math.round(bpm);
-          setStatus("分析完成 ✅");
-          setAutoBPM(String(rounded), "ok");
-        } else {
-          setStatus("无法可靠检测 BPM（音频太短或信号太弱）。");
-          setAutoBPM("--", "error");
-        }
-      } catch (e) {
-        console.error(e);
-        setStatus("分析失败：" + e);
-        setAutoBPM("--", "error");
-      } finally {
-        analyzeButton.disabled = false;
+    function addHistoryEntry(name, bpm) {
+      const now = new Date();
+      historyItems.unshift({
+        name: name,
+        bpm: bpm,
+        timeLabel: formatTime(now)
+      });
+      if (historyItems.length > 10) {
+        historyItems.pop();
       }
-    });
+      renderHistory();
+    }
 
-    // ============ 自动 BPM 检测逻辑（和之前类似） ============
+    function renderHistory() {
+      if (!historyItems.length) {
+        historyListEl.innerHTML =
+          '<span class="history-empty" id="historyEmptyText">' +
+          I18N[currentLang].historyEmpty +
+          "</span>";
+        return;
+      }
+      let html = "";
+      for (let i = 0; i < historyItems.length; i++) {
+        const item = historyItems[i];
+        html +=
+          '<div class="history-item">' +
+          '<div class="history-main">' +
+          '<span class="history-name">' +
+          escapeHtml(item.name) +
+          "</span>" +
+          '<span class="history-bpm">' +
+          item.bpm +
+          " BPM</span>" +
+          "</div>" +
+          '<div class="history-sub">' +
+          item.timeLabel +
+          "</div>" +
+          "</div>";
+      }
+      historyListEl.innerHTML = html;
+    }
+
+    function copyTextFrom(content) {
+      if (!content) return;
+      const num = content.replace(/[^\d.]/g, "");
+      if (!num) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(num).then(
+          function () {
+            setStatus("已复制 BPM: " + num);
+          },
+          function () {
+            alert("已复制 BPM: " + num);
+          }
+        );
+      } else {
+        alert("已复制 BPM: " + num);
+      }
+    }
+
+    // 自动 BPM 检测
     function estimateBPMFromBuffer(audioBuffer) {
       const sampleRate = audioBuffer.sampleRate;
       const channels = audioBuffer.numberOfChannels;
@@ -459,7 +734,6 @@
       );
 
       if (maxSamples < sampleRate * 5) {
-        // 少于 5 秒一般不靠谱
         return null;
       }
 
@@ -522,7 +796,9 @@
 
       if (!intervals.length) return null;
 
-      intervals.sort((a, b) => a - b);
+      intervals.sort(function (a, b) {
+        return a - b;
+      });
       const mid = intervals[Math.floor(intervals.length / 2)];
       if (!mid || !isFinite(mid) || mid <= 0) return null;
 
@@ -544,10 +820,7 @@
       return result;
     }
 
-    // ============ Tap BPM 逻辑 ============
-
-    let tapTimes = [];
-
+    // Tap BPM
     function updateTapBPM() {
       if (tapTimes.length < 2) {
         tapBpmValueEl.textContent = "-- BPM";
@@ -564,13 +837,14 @@
         tapBpmValueEl.textContent = "-- BPM";
         return;
       }
-      intervals.sort((a, b) => a - b);
+      intervals.sort(function (a, b) {
+        return a - b;
+      });
       const mid = intervals[Math.floor(intervals.length / 2)];
-      const bpm = 60000 / mid;
-      let result = bpm;
-      while (result < 60) result *= 2;
-      while (result > 200) result /= 2;
-      tapBpmValueEl.textContent = `${Math.round(result)} BPM`;
+      let bpm = 60000 / mid;
+      while (bpm < 60) bpm *= 2;
+      while (bpm > 200) bpm /= 2;
+      tapBpmValueEl.textContent = Math.round(bpm) + " BPM";
     }
 
     function resetTap() {
@@ -579,13 +853,61 @@
       tapButton.classList.remove("tap-active");
     }
 
-    tapButton.addEventListener("click", () => {
+    // 事件绑定
+    fileInput.addEventListener("change", function () {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+
+      currentFile = file;
+      fileNameEl.textContent = file.name;
+      setStatus("");
+      setAutoBPM(null, "idle");
+
+      const url = URL.createObjectURL(file);
+      audioPlayer.src = url;
+
+      analyzeButton.disabled = false;
+    });
+
+    analyzeButton.addEventListener("click", async function () {
+      if (!currentFile) return;
+
+      analyzeButton.disabled = true;
+      setStatus("正在分析音频，大约需要几秒钟...");
+      setAutoBPM(null, "working");
+
+      try {
+        if (!audioContext) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          audioContext = new AC();
+        }
+
+        const arrayBuffer = await currentFile.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        const bpm = estimateBPMFromBuffer(audioBuffer);
+        if (bpm) {
+          const rounded = Math.round(bpm);
+          setStatus("分析完成 ✅");
+          setAutoBPM(rounded, "ok");
+          addHistoryEntry(fileNameEl.textContent, rounded);
+        } else {
+          setStatus("无法可靠检测 BPM（音频太短或信号太弱）。");
+          setAutoBPM(null, "error");
+        }
+      } catch (e) {
+        console.error(e);
+        setStatus("分析失败：" + e);
+        setAutoBPM(null, "error");
+      } finally {
+        analyzeButton.disabled = false;
+      }
+    });
+
+    tapButton.addEventListener("click", function () {
       const now = performance.now();
 
-      if (
-        tapTimes.length &&
-        now - tapTimes[tapTimes.length - 1] > 2000
-      ) {
+      if (tapTimes.length && now - tapTimes[tapTimes.length - 1] > 2000) {
         tapTimes = [];
       }
 
@@ -595,12 +917,34 @@
       }
 
       tapButton.classList.add("tap-active");
-      setTimeout(() => tapButton.classList.remove("tap-active"), 120);
+      setTimeout(function () {
+        tapButton.classList.remove("tap-active");
+      }, 120);
 
       updateTapBPM();
     });
 
-    tapResetButton.addEventListener("click", resetTap);
+    tapResetButton.addEventListener("click", function () {
+      resetTap();
+    });
+
+    copyAutoBtn.addEventListener("click", function () {
+      copyTextFrom(autoBpmValueEl.textContent);
+    });
+
+    copyTapBtn.addEventListener("click", function () {
+      copyTextFrom(tapBpmValueEl.textContent);
+    });
+
+    langToggle.addEventListener("click", function () {
+      const next = currentLang === "zh" ? "en" : "zh";
+      applyLang(next);
+    });
+
+    // 初始化
+    applyLang("zh");
+    setAutoBPM(null, "idle");
+    renderHistory();
   </script>
 </body>
 </html>
