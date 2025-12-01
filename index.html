@@ -11,158 +11,414 @@
   <meta name="apple-mobile-web-app-title" content="Local BPM">
 
   <style>
+    :root {
+      --bg: #020710;
+      --card: rgba(10, 16, 28, 0.96);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #1db954;
+      --accent-soft: rgba(29, 185, 84, 0.12);
+      --text-main: #ffffff;
+      --text-sub: #aab1c5;
+      --text-mute: #737b91;
+      --danger: #ff4b6a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
+        sans-serif;
       margin: 0;
       padding: 0;
-      background: #0b0b0b;
-      color: #fff;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #14223d 0, #020710 55%, #000 100%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
     }
-    .container {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 16px;
+
+    .app-shell {
+      width: 100%;
+      max-width: 700px;
+      padding: 20px 16px 32px;
+    }
+
+    header {
       text-align: center;
+      margin-bottom: 18px;
     }
-    h1 {
-      font-size: 26px;
-      margin-bottom: 8px;
+
+    header h1 {
+      font-size: 24px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 0 0 4px;
     }
-    p {
-      margin: 4px 0;
-    }
-    .small {
+
+    header p {
+      margin: 0;
       font-size: 13px;
-      color: #aaa;
+      color: var(--text-sub);
+      line-height: 1.4;
     }
+
     .card {
-      margin-top: 16px;
-      padding: 16px;
-      border-radius: 12px;
-      background: #151515;
-      box-shadow: 0 0 0 1px #222;
+      background: var(--card);
+      border-radius: 22px;
+      padding: 18px 16px 20px;
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 1px var(--border);
     }
+
+    .card-section {
+      margin-bottom: 14px;
+    }
+
+    .card-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 11px;
+      color: var(--text-mute);
+    }
+
+    /* 文件选择 & 播放器 */
+
     input[type="file"] {
       display: none;
     }
-    .file-label,
-    button {
-      display: block;
-      width: 100%;
-      max-width: 360px;
-      margin: 8px auto;
-      padding: 12px 16px;
-      font-size: 16px;
-      border-radius: 999px;
-      border: none;
-      font-weight: 600;
-      text-align: center;
-    }
+
     .file-label {
-      background: #1db954;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: var(--accent);
       color: #000;
+      font-weight: 600;
+      font-size: 16px;
+      border: none;
+      text-align: center;
+      margin-bottom: 8px;
     }
-    button {
-      background: #222;
-      color: #fff;
-      border: 1px solid #444;
-    }
-    button:disabled {
-      opacity: 0.4;
-    }
-    button:active,
+
     .file-label:active {
-      opacity: 0.8;
+      transform: scale(0.99);
+      opacity: 0.9;
     }
-    #status {
-      margin-top: 8px;
+
+    .file-name {
       font-size: 14px;
-      color: #aaa;
-      min-height: 20px;
+      color: var(--text-sub);
+      text-align: center;
+      word-break: break-all;
+      margin-bottom: 10px;
+      min-height: 18px;
     }
-    #bpm {
-      font-size: 32px;
-      font-weight: 700;
-      margin-top: 8px;
-    }
+
     audio {
       width: 100%;
-      margin-top: 12px;
+      margin: 0;
+      accent-color: var(--accent);
     }
-    .filename {
+
+    /* BPM 显示区域 */
+
+    .bpm-display {
+      margin-top: 10px;
+      padding: 12px 10px 10px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #0b162a, #050a16);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .bpm-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .bpm-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-mute);
+    }
+
+    .bpm-value {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+    }
+
+    .bpm-unit {
+      font-size: 14px;
+      margin-left: 4px;
+      opacity: 0.8;
+    }
+
+    .badge {
+      font-size: 11px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .status-text {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--text-mute);
+      min-height: 16px;
+      text-align: left;
+    }
+
+    /* 按钮 */
+
+    .btn {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #121724;
+      color: var(--text-main);
       font-size: 15px;
-      margin-top: 8px;
-      word-break: break-all;
+      font-weight: 500;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.99);
+      opacity: 0.95;
+    }
+
+    /* Tap BPM */
+
+    .tap-wrapper {
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tap-circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.18), transparent 55%),
+                  radial-gradient(circle at 70% 80%, rgba(29, 185, 84, 0.25), transparent 65%);
+      color: var(--text-main);
+    }
+
+    .tap-circle.tap-active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 6px rgba(29, 185, 84, 0.18);
+    }
+
+    .tap-info {
+      font-size: 12px;
+      color: var(--text-mute);
+      text-align: center;
+    }
+
+    .tap-bpm {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .tap-actions {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .tap-reset {
+      font-size: 11px;
+      color: var(--text-mute);
+      background: transparent;
+      border: none;
+      text-decoration: underline;
+    }
+
+    @media (min-width: 700px) {
+      .app-shell {
+        padding-top: 32px;
+      }
+      header h1 {
+        font-size: 26px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>本地音乐 BPM 检测</h1>
-    <p class="small">
-      从「文件」中选择一首音频（mp3 / m4a / wav 等非 DRM 文件），
-      然后点击「分析 BPM」。
-    </p>
-    <p class="small">
-      仅在你的浏览器本地处理音频，不会上传到服务器。
-    </p>
+  <div class="app-shell">
+    <header>
+      <h1>本地音乐 BPM 检测</h1>
+      <p>选择本地音频文件，一键分析节奏，也可以用手动 Tap 算 BPM。</p>
+    </header>
 
-    <div class="card">
-      <label class="file-label" for="fileInput">选择音频文件</label>
-      <input id="fileInput" type="file" />
+    <main class="card">
+      <!-- 文件 & 播放 -->
+      <section class="card-section">
+        <div class="section-title">
+          <span>音频文件</span>
+          <span class="pill">本地处理 · 无上传</span>
+        </div>
 
-      <p id="fileName" class="filename">当前未选择文件</p>
+        <label class="file-label" for="fileInput">选择音频文件</label>
+        <input id="fileInput" type="file" />
 
-      <audio id="audioPlayer" controls></audio>
+        <p id="fileName" class="file-name">当前未选择文件</p>
 
-      <button id="analyzeButton" disabled>分析 BPM</button>
+        <audio id="audioPlayer" controls></audio>
 
-      <div id="status"></div>
-      <div id="bpm"></div>
-    </div>
+        <button id="analyzeButton" class="btn" disabled>分析 BPM（自动检测）</button>
+
+        <div class="bpm-display">
+          <div class="bpm-left">
+            <span class="bpm-label">自动检测</span>
+            <div>
+              <span id="autoBpmValue" class="bpm-value">--</span>
+              <span class="bpm-unit">BPM</span>
+            </div>
+          </div>
+          <span id="autoBadge" class="badge">等待分析</span>
+        </div>
+
+        <p id="status" class="status-text"></p>
+      </section>
+
+      <!-- Tap BPM -->
+      <section class="card-section">
+        <div class="section-title">
+          <span>手动 Tap 节奏</span>
+          <span class="pill">适合现场 / 外放音乐</span>
+        </div>
+
+        <div class="tap-wrapper">
+          <button id="tapButton" type="button" class="tap-circle">
+            跟着节奏点我
+          </button>
+
+          <div class="tap-info">
+            最近节奏估计：
+            <div id="tapBpmValue" class="tap-bpm">-- BPM</div>
+            <div class="tap-actions">
+              <button id="tapReset" type="button" class="tap-reset">清空节奏</button>
+            </div>
+            <div style="margin-top: 4px;">
+              可以让手机听音箱、现场音乐，用手跟着节奏连续点击。
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script>
-    const fileInput = document.getElementById('fileInput');
-    const analyzeButton = document.getElementById('analyzeButton');
-    const fileNameEl = document.getElementById('fileName');
-    const statusEl = document.getElementById('status');
-    const bpmEl = document.getElementById('bpm');
-    const audioPlayer = document.getElementById('audioPlayer');
+    const fileInput = document.getElementById("fileInput");
+    const analyzeButton = document.getElementById("analyzeButton");
+    const fileNameEl = document.getElementById("fileName");
+    const statusEl = document.getElementById("status");
+    const autoBpmValueEl = document.getElementById("autoBpmValue");
+    const autoBadgeEl = document.getElementById("autoBadge");
+    const audioPlayer = document.getElementById("audioPlayer");
+
+    const tapButton = document.getElementById("tapButton");
+    const tapBpmValueEl = document.getElementById("tapBpmValue");
+    const tapResetButton = document.getElementById("tapReset");
 
     let currentFile = null;
     let audioContext = null;
 
     function setStatus(text) {
-      statusEl.textContent = text || '';
+      statusEl.textContent = text || "";
     }
 
-    function setBPM(text) {
-      bpmEl.textContent = text || '';
+    function setAutoBPM(bpmText, state) {
+      autoBpmValueEl.textContent = bpmText || "--";
+      if (state === "idle") {
+        autoBadgeEl.textContent = "等待分析";
+        autoBadgeEl.style.color = "#aab1c5";
+        autoBadgeEl.style.background = "rgba(255,255,255,0.04)";
+      } else if (state === "ok") {
+        autoBadgeEl.textContent = "分析完成";
+        autoBadgeEl.style.color = "#1db954";
+        autoBadgeEl.style.background = "rgba(29,185,84,0.16)";
+      } else if (state === "error") {
+        autoBadgeEl.textContent = "分析失败";
+        autoBadgeEl.style.color = "#ff8fa1";
+        autoBadgeEl.style.background = "rgba(255,75,106,0.16)";
+      } else if (state === "working") {
+        autoBadgeEl.textContent = "分析中...";
+        autoBadgeEl.style.color = "#ffd27f";
+        autoBadgeEl.style.background = "rgba(255,210,127,0.16)";
+      }
     }
 
-    fileInput.addEventListener('change', () => {
+    fileInput.addEventListener("change", () => {
       const file = fileInput.files && fileInput.files[0];
       if (!file) return;
 
       currentFile = file;
       fileNameEl.textContent = file.name;
-      setStatus('');
-      setBPM('');
+      setStatus("");
+      setAutoBPM("--", "idle");
 
-      // 设置 audio 播放
       const url = URL.createObjectURL(file);
       audioPlayer.src = url;
 
       analyzeButton.disabled = false;
     });
 
-    analyzeButton.addEventListener('click', async () => {
+    analyzeButton.addEventListener("click", async () => {
       if (!currentFile) return;
 
       analyzeButton.disabled = true;
-      setStatus('正在分析音频，大约需要几秒钟...');
-      setBPM('');
+      setStatus("正在分析音频，大约需要几秒钟...");
+      setAutoBPM("--", "working");
 
       try {
         if (!audioContext) {
@@ -175,32 +431,38 @@
 
         const bpm = estimateBPMFromBuffer(audioBuffer);
         if (bpm) {
-          setStatus('分析完成 ✅');
-          setBPM(`${Math.round(bpm)} BPM`);
+          const rounded = Math.round(bpm);
+          setStatus("分析完成 ✅");
+          setAutoBPM(String(rounded), "ok");
         } else {
-          setStatus('无法可靠地检测 BPM（音频太短或信号太弱）。');
-          setBPM('');
+          setStatus("无法可靠检测 BPM（音频太短或信号太弱）。");
+          setAutoBPM("--", "error");
         }
       } catch (e) {
         console.error(e);
-        setStatus('分析失败：' + e);
-        setBPM('');
+        setStatus("分析失败：" + e);
+        setAutoBPM("--", "error");
       } finally {
         analyzeButton.disabled = false;
       }
     });
 
-    // ============ BPM 检测核心逻辑（简化版） ============
-
+    // ============ 自动 BPM 检测逻辑（和之前类似） ============
     function estimateBPMFromBuffer(audioBuffer) {
       const sampleRate = audioBuffer.sampleRate;
       const channels = audioBuffer.numberOfChannels;
 
-      // 只用前 60 秒数据，避免太慢
       const maxSeconds = 60;
-      const maxSamples = Math.min(audioBuffer.length, sampleRate * maxSeconds);
+      const maxSamples = Math.min(
+        audioBuffer.length,
+        Math.floor(sampleRate * maxSeconds)
+      );
 
-      // 转成单声道
+      if (maxSamples < sampleRate * 5) {
+        // 少于 5 秒一般不靠谱
+        return null;
+      }
+
       let mono = new Float32Array(maxSamples);
       if (channels === 1) {
         mono.set(audioBuffer.getChannelData(0).subarray(0, maxSamples));
@@ -212,7 +474,6 @@
         }
       }
 
-      // 分帧计算能量
       const frameSize = 1024;
       const hopSize = 512;
       const energies = [];
@@ -227,58 +488,47 @@
 
       if (energies.length < 10) return null;
 
-      // 简单平滑
       const smoothed = movingAverage(energies, 4);
 
-      // 计算一阶差分 -> onset 强度
       const onset = [];
       for (let i = 1; i < smoothed.length; i++) {
         const diff = smoothed[i] - smoothed[i - 1];
         onset.push(Math.max(0, diff));
       }
 
-      if (onset.length === 0) return null;
+      if (!onset.length) return null;
 
       const maxOnset = Math.max(...onset);
       if (maxOnset <= 0) return null;
 
-      // 简单阈值检测峰值
       const threshold = maxOnset * 0.3;
       const peaks = [];
       for (let i = 0; i < onset.length; i++) {
         const v = onset[i];
         if (v > threshold) {
-          if (peaks.length > 0 && i - peaks[peaks.length - 1] < 3) {
-            continue;
-          }
+          if (peaks.length > 0 && i - peaks[peaks.length - 1] < 3) continue;
           peaks.push(i);
         }
       }
 
       if (peaks.length < 2) return null;
 
-      // 计算相邻峰之间的时间间隔
       const frameDuration = hopSize / sampleRate;
       const intervals = [];
       for (let i = 1; i < peaks.length; i++) {
         const dt = (peaks[i] - peaks[i - 1]) * frameDuration;
-        if (dt > 0) {
-          intervals.push(dt);
-        }
+        if (dt > 0) intervals.push(dt);
       }
 
-      if (intervals.length === 0) return null;
+      if (!intervals.length) return null;
 
       intervals.sort((a, b) => a - b);
       const mid = intervals[Math.floor(intervals.length / 2)];
       if (!mid || !isFinite(mid) || mid <= 0) return null;
 
       let bpm = 60 / mid;
-
-      // 限制到 60~200 之间
       while (bpm < 60) bpm *= 2;
       while (bpm > 200) bpm /= 2;
-
       return bpm;
     }
 
@@ -288,15 +538,69 @@
       let sum = 0;
       for (let i = 0; i < arr.length; i++) {
         sum += arr[i];
-        if (i >= win) {
-          sum -= arr[i - win];
-        }
-        if (i >= win - 1) {
-          result.push(sum / win);
-        }
+        if (i >= win) sum -= arr[i - win];
+        if (i >= win - 1) result.push(sum / win);
       }
       return result;
     }
+
+    // ============ Tap BPM 逻辑 ============
+
+    let tapTimes = [];
+
+    function updateTapBPM() {
+      if (tapTimes.length < 2) {
+        tapBpmValueEl.textContent = "-- BPM";
+        return;
+      }
+      const intervals = [];
+      for (let i = 1; i < tapTimes.length; i++) {
+        const dt = tapTimes[i] - tapTimes[i - 1];
+        if (dt > 0 && dt < 3000) {
+          intervals.push(dt);
+        }
+      }
+      if (!intervals.length) {
+        tapBpmValueEl.textContent = "-- BPM";
+        return;
+      }
+      intervals.sort((a, b) => a - b);
+      const mid = intervals[Math.floor(intervals.length / 2)];
+      const bpm = 60000 / mid;
+      let result = bpm;
+      while (result < 60) result *= 2;
+      while (result > 200) result /= 2;
+      tapBpmValueEl.textContent = `${Math.round(result)} BPM`;
+    }
+
+    function resetTap() {
+      tapTimes = [];
+      tapBpmValueEl.textContent = "-- BPM";
+      tapButton.classList.remove("tap-active");
+    }
+
+    tapButton.addEventListener("click", () => {
+      const now = performance.now();
+
+      if (
+        tapTimes.length &&
+        now - tapTimes[tapTimes.length - 1] > 2000
+      ) {
+        tapTimes = [];
+      }
+
+      tapTimes.push(now);
+      if (tapTimes.length > 8) {
+        tapTimes = tapTimes.slice(tapTimes.length - 8);
+      }
+
+      tapButton.classList.add("tap-active");
+      setTimeout(() => tapButton.classList.remove("tap-active"), 120);
+
+      updateTapBPM();
+    });
+
+    tapResetButton.addEventListener("click", resetTap);
   </script>
 </body>
 </html>
